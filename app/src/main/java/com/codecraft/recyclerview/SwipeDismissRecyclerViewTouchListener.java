@@ -72,6 +72,7 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
     private RecyclerView.ViewHolder mDownHolder;
     private View mDownView;
     private boolean mPaused;
+    private boolean mIsDismissiblePosition;
 
     /**
      * The callback interface used by {@link SwipeDismissRecyclerViewTouchListener} to inform its client
@@ -104,7 +105,7 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
     /**
      * Constructs a new swipe-to-dismiss touch listener for the given list view.
      *
-     * @param recyclerView  The RecyclerView whose items should be dismissable.
+     * @param recyclerView  The RecyclerView whose items should be dismissible.
      * @param callbacks The callback to trigger when the user has indicated that she would like to
      *                  dismiss one or more list items.
      */
@@ -188,12 +189,9 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     mDownY = motionEvent.getRawY();
                     mDownPosition = mRecyclerView.getChildPosition(mDownView);
                     mDownHolder = mRecyclerView.getChildViewHolder(mDownView);
-                    if (mCallbacks.canDismiss(mDownPosition)) {
-                        mVelocityTracker = VelocityTracker.obtain();
-                        mVelocityTracker.addMovement(motionEvent);
-                    } else {
-                        mDownView = null;
-                    }
+                    mIsDismissiblePosition = mCallbacks.canDismiss(mDownPosition);
+                    mVelocityTracker = VelocityTracker.obtain();
+                    mVelocityTracker.addMovement(motionEvent);
                 }
                 return false;
             }
@@ -246,7 +244,8 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     dismiss = (velocityX < 0) == (deltaX < 0);
                     dismissRight = mVelocityTracker.getXVelocity() > 0;
                 }
-                if (dismiss && mDownPosition != RecyclerView.NO_POSITION) {
+                if (dismiss && mDownPosition != RecyclerView.NO_POSITION
+                        && mIsDismissiblePosition) {
                     mDownView.setPressed(false);
                     // dismiss
                     final RecyclerView.ViewHolder viewHolder = mDownHolder;
@@ -295,6 +294,10 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     if (mDownView != null) {
                         mDownView.setPressed(false);
                     }
+                    break;
+                }
+
+                if (!mIsDismissiblePosition) {
                     break;
                 }
 
