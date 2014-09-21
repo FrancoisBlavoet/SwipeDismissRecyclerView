@@ -5,9 +5,11 @@ import android.animation.AnimatorListenerAdapter;
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.accessibility.AccessibilityEvent;
 
 /**
  * A {@link android.view.View.OnTouchListener} that makes the list items in a {@landroid.support.v7.widget.RecyclerView}
@@ -74,6 +76,7 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
     /**
      * The callback interface used by {@link SwipeDismissRecyclerViewTouchListener} to inform its client
      * about a successful dismissal of one or more list item positions.
+     * Also used to inform the client when a list item is clicked.
      */
     public interface DismissCallbacks {
         /**
@@ -85,10 +88,17 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
          * Called when the user has indicated they she would like to dismiss one or more list item
          * positions.
          *
-         * @param recyclerView           The originating {@link android.support.v7.widget.RecyclerView}.
+         * @param recyclerView the originating {@link android.support.v7.widget.RecyclerView}.
          * @param holder the {@link android.support.v7.widget.RecyclerView.ViewHolder} corresponding to the item being dismissed
          */
         void onDismiss(RecyclerView recyclerView, RecyclerView.ViewHolder holder);
+
+        /**
+         * called when the user has clicked on one the list items
+         * @param recyclerView  The originating {@link android.support.v7.widget.RecyclerView}.
+         * @param holder the {@link android.support.v7.widget.RecyclerView.ViewHolder} corresponding to the item being click
+         */
+        void onClick(RecyclerView recyclerView, RecyclerView.ViewHolder holder);
     }
 
     /**
@@ -174,6 +184,7 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
 
                 if (mDownView != null) {
                     mDownX = motionEvent.getRawX();
+                    mDownView.setPressed(true);
                     mDownY = motionEvent.getRawY();
                     mDownPosition = mRecyclerView.getChildPosition(mDownView);
                     mDownHolder = mRecyclerView.getChildViewHolder(mDownView);
@@ -192,13 +203,16 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     break;
                 }
 
-                if (mDownView != null && mSwiping) {
-                    // cancel
-                    mDownView.animate()
-                            .translationX(0)
-                            .alpha(1)
-                            .setDuration(mAnimationTime)
-                            .setListener(null);
+                if (mDownView != null) {
+                    mDownView.setPressed(false);
+                    if (mSwiping) {
+                        // cancel
+                        mDownView.animate()
+                                .translationX(0)
+                                .alpha(1)
+                                .setDuration(mAnimationTime)
+                                .setListener(null);
+                    }
                 }
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
@@ -233,6 +247,7 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                     dismissRight = mVelocityTracker.getXVelocity() > 0;
                 }
                 if (dismiss && mDownPosition != RecyclerView.NO_POSITION) {
+                    mDownView.setPressed(false);
                     // dismiss
                     final RecyclerView.ViewHolder viewHolder = mDownHolder;
                     mDownView.animate()
@@ -246,12 +261,20 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
                                 }
                             });
                 } else {
+                    mDownView.setPressed(false);
                     // cancel
                     mDownView.animate()
                             .translationX(0)
                             .alpha(1)
                             .setDuration(mAnimationTime)
                             .setListener(null);
+
+                    if (!mSwiping  && !mPaused) {
+                        mDownView.performClick();
+                        mDownView.playSoundEffect(SoundEffectConstants.CLICK);
+                        mCallbacks.onClick(mRecyclerView, mDownHolder);
+                    }
+
                 }
                 mVelocityTracker.recycle();
                 mVelocityTracker = null;
@@ -265,7 +288,13 @@ public class SwipeDismissRecyclerViewTouchListener implements View.OnTouchListen
             }
 
             case MotionEvent.ACTION_MOVE: {
-                if (mVelocityTracker == null || mPaused) {
+                if (mVelocityTracker == null) {
+                    break;
+                }
+                if (mPaused) {
+                    if (mDownView != null) {
+                        mDownView.setPressed(false);
+                    }
                     break;
                 }
 
