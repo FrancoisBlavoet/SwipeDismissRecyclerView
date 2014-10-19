@@ -1,4 +1,4 @@
-package com.codecraft.recyclerview;
+package com.codecraft.swipesample;
 
 /**
  * Created by François on 31/08/2014.

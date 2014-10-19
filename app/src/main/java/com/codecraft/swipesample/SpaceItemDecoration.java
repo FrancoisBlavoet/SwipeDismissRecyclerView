@@ -1,9 +1,10 @@
-package com.codecraft.recyclerview;
+package com.codecraft.swipesample;
 
 
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+
 import static android.support.v7.widget.RecyclerView.HORIZONTAL;
 import static android.support.v7.widget.RecyclerView.VERTICAL;
 

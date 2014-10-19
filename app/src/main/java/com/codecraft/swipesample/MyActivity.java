@@ -1,4 +1,4 @@
-package com.codecraft.recyclerview;
+package com.codecraft.swipesample;
 
 import android.app.Activity;
 import android.os.Bundle;
