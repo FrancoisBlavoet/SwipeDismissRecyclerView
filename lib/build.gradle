@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "com.codecraft.swipedismissrecyclerview"
-        minSdkVersion '15'
-        targetSdkVersion '21'
+        minSdkVersion 15
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }

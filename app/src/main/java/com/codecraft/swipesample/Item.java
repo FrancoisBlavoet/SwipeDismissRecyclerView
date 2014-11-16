@@ -2,6 +2,7 @@ package com.codecraft.swipesample;
 
 /**
  * Created by François on 31/08/2014.
+ * sample list item
  */
 public class Item {
 

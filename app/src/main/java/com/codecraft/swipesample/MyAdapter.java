@@ -36,7 +36,6 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.TextViewHolder> im
     @Override
     public void onBindViewHolder(TextViewHolder viewHolder, int i) {
         viewHolder.text.setText(items.get(i).getText());
-
         viewHolder.itemView.setAlpha(1);
     }
 

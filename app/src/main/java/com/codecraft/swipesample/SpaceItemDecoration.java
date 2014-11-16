@@ -4,6 +4,7 @@ package com.codecraft.swipesample;
 import android.graphics.Rect;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 
 import static android.support.v7.widget.RecyclerView.HORIZONTAL;
 import static android.support.v7.widget.RecyclerView.VERTICAL;
@@ -48,6 +49,15 @@ public class SpaceItemDecoration extends RecyclerView.ItemDecoration {
 
     @Override
     public void getItemOffsets(Rect outRect, int itemPosition, RecyclerView parent) {
+        if (mOrientation == VERTICAL) {
+            outRect.set(0, 0, 0, mGapWidth);
+        } else {
+            outRect.set(0, 0, mGapWidth, 0);
+        }
+    }
+
+    @Override
+    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         if (mOrientation == VERTICAL) {
             outRect.set(0, 0, 0, mGapWidth);
         } else {

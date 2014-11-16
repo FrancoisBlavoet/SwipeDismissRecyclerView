@@ -40,15 +40,6 @@ public class RecyclerViewFragment extends Fragment {
                                 return true;
                             }
 
-                            @Override
-                            public void onDismiss(RecyclerView recyclerView, RecyclerView.ViewHolder[] holders) {
-                                for ( RecyclerView.ViewHolder position : holders) {
-                                     mAdapter.remove(position);
-                                }
-                                mAdapter.notifyDataSetChanged();
-                                // mAdapter.remove();
-                            }
-
 
                             public void onDismiss(RecyclerView recyclerView, RecyclerView.ViewHolder holder) {
                                 mAdapter.remove(holder);
@@ -56,23 +47,6 @@ public class RecyclerViewFragment extends Fragment {
                         });
         recyclerView.addOnItemTouchListener(listener);
         recyclerView.setOnScrollListener(listener.makeScrollListener());
-
-        SwipeDismissListViewTouchListener listListener = new SwipeDismissListViewTouchListener(recyclerView,new SwipeDismissListViewTouchListener.DismissCallbacks() {
-            @Override
-            public boolean canDismiss(int position) {
-                return true;
-            }
-
-            @Override
-            public void onDismiss(RecyclerView listView, int[] reverseSortedPositions) {
-                for (int position : reverseSortedPositions) {
-                   // mAdapter.remove(mAdapter.get(position));
-                }
-                mAdapter.notifyDataSetChanged();
-               // mAdapter.remove();
-            }
-        });
-       // recyclerView.setOnTouchListener(listListener);
 
         return rootView;
     }
